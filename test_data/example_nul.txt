@@ -1,0 +1,18 @@
+# Example file for the main program execution
+Dnu_target=50.
+epsilon_target=0.5
+d0l_target=-1.5,-1.5,-1.5
+# l    nu
+0      100
+0      200
+0      300
+0      400
+1      151
+1      251
+1      351
+1      451
+2      95
+2      195
+2      295
+2      395
+2      495
