@@ -1,5 +1,6 @@
 #include <Eigen/Dense>
 #include <cmath>
+#include <iostream>
 #include "linspace.h"
 #include "linfit.h"
 #include "decompose_nu.h"
@@ -19,11 +20,11 @@ Freq_modes rescale_freqs(const double Dnu_star, const double epsilon_star, const
    const bool verbose = false;
    const double Cfactor = 0.25;
    int l;
-   double Dnu_ref, epsilon_ref, n0_ref, n0_star, Dnu_l, e;
+   double Dnu_ref, epsilon_ref, n0_ref, n0_star, e;
    VectorXd tmp, n_ref, n_star, fcoefs, fcoefs_star;
    Freq_modes freqs_star;
    Data_asympt_p asymp_l1,asymp_l2,asymp_l3;
-
+   freqs_star.error_status=false; // By default, no error
    // Initial check
    if(freqs_ref.fl0.size() == 0){
         std::cout << "Warning: You must at least set freqs_ref.fl0 !" << std::endl;
@@ -46,17 +47,17 @@ Freq_modes rescale_freqs(const double Dnu_star, const double epsilon_star, const
     freqs_star.fl0=(freqs_ref.fl0/Dnu_ref + tmp) * Dnu_star;
     n_star=linspace(0, freqs_star.fl0.size()-1, freqs_star.fl0.size()); // First array without knowing n0
     fcoefs_star=linfit(n_star, freqs_star.fl0);
-    Dnu_l=fcoefs_star[0];
+    //Dnu_l=fcoefs_star[0];
     e=modf(fcoefs_star[1]/fcoefs_star[0], &n0_star);
-    n_star=linspace(n0_star, n0_star + freqs_star.fl0.size()-1, freqs_star.fl0.size()); // Recompute n_star now that we know n0
-    
+    n_star=linspace(n0_star, n0_star + freqs_star.fl0.size()-1, freqs_star.fl0.size()); // Recompute n_star now that we know n0  
     // l=1
     l=1;
     if(freqs_ref.fl1.size() != 0){
         if (d0l_star[0] <= -9999){
             std::cout << "Error: fl1 and dl1_star must be jointly set! Otherwise do not pass them as arguments" <<  std::endl;
             std::cout << "       Cannot rescale" << std::endl;
-            exit(EXIT_FAILURE);
+            freqs_star.error_status=true;
+            //exit(EXIT_FAILURE);
         }
         // Rescaling the fl_ref:
         //       1. Extract all of asymtptotic elements. In particular nl and O2_l
@@ -72,9 +73,10 @@ Freq_modes rescale_freqs(const double Dnu_star, const double epsilon_star, const
     l=2;
     if(freqs_ref.fl2.size() != 0){
         if (d0l_star[1] <= -9999){
-            std::cout << "Error: fl2 and dl2_star must be jointly set! Otherwise do not pass them as arguments" <<  std::endl;
-            std::cout << "       Cannot rescale" << std::endl;
-            exit(EXIT_FAILURE);
+            std::cerr << "Error: fl2 and dl2_star must be jointly set! Otherwise do not pass them as arguments" <<  std::endl;
+            std::cerr << "       Cannot rescale" << std::endl;
+            freqs_star.error_status=true;            
+            //exit(EXIT_FAILURE);
         }
         // Rescaling the fl_ref:
         //       1. Extract all of asymtptotic elements. In particular nl and O2_l
@@ -90,9 +92,10 @@ Freq_modes rescale_freqs(const double Dnu_star, const double epsilon_star, const
     l=3;
     if(freqs_ref.fl3.size() != 0){
         if (d0l_star[2] <= -9999){
-            std::cout << "Error: fl2 and dl2_star must be jointly set! Otherwise do not pass them as arguments" <<  std::endl;
-            std::cout << "       Cannot rescale" << std::endl;
-            exit(EXIT_FAILURE);
+            std::cerr << "Error: fl2 and dl2_star must be jointly set! Otherwise do not pass them as arguments" <<  std::endl;
+            std::cerr << "       Cannot rescale" << std::endl;
+           freqs_star.error_status=true;            
+            //exit(EXIT_FAILURE);
         }
         // Rescaling the fl_ref:
         //       1. Extract all of asymtptotic elements. In particular nl and O2_l

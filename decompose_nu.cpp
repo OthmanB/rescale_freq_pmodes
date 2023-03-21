@@ -121,6 +121,8 @@ Data_asympt_p decompose_nu_nl(const int l, const VectorXd fl0, const VectorXd fl
     VectorXi n_s_optimum;
     VectorXd tmp, n_ref, n_l, n_best, grad;
 	double Dnu, epsilon, n0_0, d0l, e0, n0_l;
+    output.error_status=false; // No error by default
+
 	// Compute Dnu and epsilon
 	n_ref=linspace(0, fl0.size()-1, fl0.size());
 	fitcoef=linfit(n_ref, fl0);
@@ -163,7 +165,9 @@ Data_asympt_p decompose_nu_nl(const int l, const VectorXd fl0, const VectorXd fl
             std::cout << "       sol     = " << sol.transpose() << std::endl;
             std::cout << "       Dnu     = " << Dnu << std::endl;
             std::cout << "       Cfactor = " << Cfactor << std::endl;
-            exit(EXIT_FAILURE);
+            output.error_status=true; // Return the structure but flag that an error happened
+            return output;
+            //exit(EXIT_FAILURE);
         } else{
     	    n_best=n_all.row(n_s_optimum[0]);  //This is the list of identified n following the conditions in the where
 		    d0l=sol[n_s_optimum[0]];  // This is the best solution for d0l + O(2)
